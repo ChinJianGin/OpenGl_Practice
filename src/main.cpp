@@ -11,6 +11,7 @@
     #include "Header/VBO.h"
     #include "Header/EBO.h"
     #include "Header/Texture.h"
+    #include "Header/camera.h"
     // settings
     const unsigned int SCR_WIDTH = 800;
     const unsigned int SCR_HEIGHT = 800;
@@ -91,8 +92,7 @@
         VBO1.Unbind();
         EBO1.Unbind();
 
-        //Gets ID of uniiform called "scaled"
-        GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
+       
 
         //Texture
 
@@ -105,12 +105,13 @@
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
 
-        //Variables that help the rotation of the pyramid
-        float rotation = 0.0f;
-        double prevTime = glfwGetTime();
+        
 
         //Enables the Depth Buffer
         glEnable(GL_DEPTH_TEST);
+
+        //Creates camera onject
+        Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
 
         while (!glfwWindowShouldClose(window))
         {
@@ -121,34 +122,12 @@
             //Tell OpenGL which Shader Program we want to use
             shaderProgram.Activate();
 
-            //Simple timer
-            double crnTime = glfwGetTime();
-            if(crnTime - prevTime >= 1 / 60)
-            {
-                rotation += 0.5f;
-                prevTime = crnTime;
-            }
+            //Handles camera inputs
+            camera.Inputs(window);
+            //Updates and exports the camera matrix to the Vertex Shader
+            camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
 
-            //Initializes matrices so they are not the null matrix
-            glm::mat4 model = glm::mat4(1.0f);
-            glm::mat4 view = glm::mat4(1.0f);
-            glm::mat4 proj = glm::mat4(1.0f);
-
-            //Assigns different transformations to each matrix
-            model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-            view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-            proj = glm::perspective(glm::radians(45.0f), (float)(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
-
-            // Outputs the matrices into the Vertex Shader
-            int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-            int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
-            glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-
-            //Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
-            glUniform1f(uniID, 0.5f);
+           
             // Binds texture so that is appears in render
             popCat.Bind();
             //Bind the VAO so OpenGL knows to use it

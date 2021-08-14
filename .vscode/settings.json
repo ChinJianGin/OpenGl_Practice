@@ -40,6 +40,18 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "glsllint.glslangValidatorPath": "E:\\martin\\Code\\OpenGL\\glslang-master-windows-x64-Release\\bin\\glslangValidator.exe"
+        "glsllint.glslangValidatorPath": "E:\\martin\\Code\\OpenGL\\glslang-master-windows-x64-Release\\bin\\glslangValidator.exe",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "set": "cpp",
+        "iomanip": "cpp",
+        "valarray": "cpp"
     }
 }

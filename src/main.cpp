@@ -1,17 +1,4 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <math.h>
-#include "Header/shaderClass.h"
-#include "Header/VAO.h"
-#include "Header/VBO.h"
-#include "Header/EBO.h"
-#include "Header/Texture.h"
-#include "Header/camera.h"
+#include "Header/Mesh.h"
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -20,46 +7,36 @@ const unsigned int SCR_HEIGHT = 800;
 
 //Fragment Shader source code
 
-int main()
+ //Vertices coordinates
+Vertex vertices[] =
+{  //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+    Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3( 1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3( 1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
+};
+
+// Indices for vertices order
+GLuint indices[] =
 {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //uncomment this statement to fix compilation on OS X
-#endif
+    0, 1, 2,
+	0, 2, 3
+};
 
-    //Vertices coordinates
-    GLfloat vertices[] =
-    {  //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-        -1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
-	    -1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	    1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	    1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
-    };
+Vertex lightVertices[] =
+{//  COORDINATES    //
+        Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
+        Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
+        Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
+        Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
+        Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
+        Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
+        Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
+        Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
+};
 
-    GLuint indices[] =
-        {
-            0, 1, 2,
-	        0, 2, 3
-        };
-
-    GLfloat lightVertices[] =
-        {//  COORDINATES    //
-         -0.1f, -0.1f, 0.1f,
-         -0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f, 0.1f,
-         -0.1f, 0.1f, 0.1f,
-         -0.1f, 0.1f, -0.1f,
-         0.1f, 0.1f, -0.1f,
-         0.1f, 0.1f, 0.1f};
-
-    GLuint lightIndices[] = 
-    {
+GLuint lightIndices[] = 
+{
         0, 1, 2,
         0, 2, 3,
         0, 4, 7,
@@ -72,7 +49,25 @@ int main()
         1, 4, 0,
         4, 5, 6,
         4, 6, 7
-    };
+};
+
+int main()
+{
+    // glfw: initialize and configure
+    // ------------------------------
+    glfwInit();
+    // Tell GLFW what version of OpenGL we are using
+    // In this case we are using OpenGl 3.3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // Tell GLFW we are using the CORE profile
+    // So that means we only have the modern function
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //uncomment this statement to fix compilation on OS X
+#endif
+
+   
 
     // glfw window creation
     // --------------------
@@ -99,40 +94,33 @@ int main()
     //In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
+    // Texture data
+    Texture textures[]
+    {
+        Texture("resource/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+        Texture("resource/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+    };
+
+    // Generates Shader object using shaders VertexShader.vs and FragmentShader.fs
     Shader shaderProgram("src/Shaders/VertexShader.vs", "src/Shaders/FragmentShader.fs");
 
-    VAO VAO1;
-    VAO1.Bind();
-
-    VBO VBO1(vertices, sizeof(vertices));
-    EBO EBO1(indices, sizeof(indices));
-
-    VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void *)0);
-    VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float)));
-    VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void *)(6 * sizeof(float)));
-    VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void *)(8 * sizeof(float)));
-    VAO1.Unbind();
-    VBO1.Unbind();
-    EBO1.Unbind();
+    // Store mesh data in vectors for the mesh
+    std::vector <Vertex> verts(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
+    std::vector <GLuint> ind(indices, indices + sizeof(indices) / sizeof(GLuint));
+    std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
+    // Create floor mesh
+    Mesh floor(verts, ind, tex);
 
     // Shader for light cube
     Shader lightShader("src/Shaders/Light.vs", "src/Shaders/Light.fs");
-    // Generates Vertex Array Object and binds it
-    VAO lightVAO;
-    lightVAO.Bind();
-    // Generates Vertex Buffer Object and links it to vertices
-    VBO lightVBO(lightVertices, sizeof(lightVertices));
-    //Generates Elemnet Buffer Object and links it io indices
-    EBO lightEBO(lightIndices, sizeof(lightIndices));
-    // Links VBO attributes such as coordinates and colors to VAO
-    lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
-    // Unbind all to prevent accidentally modify them
-    lightVAO.Unbind();
-    lightVBO.Unbind();
-    lightEBO.Unbind();
+    // Store mesh data in vectors for the mesh
+    std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
+    std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
+    // Create light mesh
+    Mesh light(lightVerts, lightInd, tex);
 
+    
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
     glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
     glm::mat4 lightModel = glm::mat4(1.0f);
     lightModel = glm::translate(lightModel, lightPos);
@@ -151,10 +139,7 @@ int main()
 
     //Texture
 
-    Texture planksTex("resource/planks.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
-    planksTex.texUnit(shaderProgram, "tex0", 0);
-    Texture planksSpec("resource/planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
-    planksSpec.texUnit(shaderProgram, "tex1", 1);
+    
 
     // render loop
     // -----------
@@ -181,25 +166,10 @@ int main()
         //Updates and exports the camera matrix to the Vertex Shader
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
 
-         //Tell OpenGL which Shader Program we want to use
-        shaderProgram.Activate();
-        // Exports the camera Position to the Fragment Shader for specular lighting
-        glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
-        // Exports the camMatrix to the Vertex Shader of the pyramid
-        camera.Matrix(shaderProgram, "camMatrix");
-
-        // Binds texture so that is appears in render
-        planksTex.Bind();
-        planksSpec.Bind();
-        //Bind the VAO so OpenGL knows to use it
-        VAO1.Bind();
-        //Draw the triangle using the GL_TRIANGLES primitive
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
-
-        lightShader.Activate();
-        camera.Matrix(lightShader, "camMatrix");
-        lightVAO.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+        // Draws different meshes
+        floor.Draw(shaderProgram, camera);
+        light.Draw(lightShader, camera);
+        
         // glfw: swap buffers and poll IO events (keyspressed/released, mouse moved etc.)
         // ---------------------------------------------------
         glfwSwapBuffers(window);
@@ -207,15 +177,8 @@ int main()
     }
 
     //Delete all the object we've created
-    VAO1.Delete();
-    VBO1.Delete();
-    EBO1.Delete();
-    planksTex.Delete();
-    planksSpec.Delete();
+   
     shaderProgram.Delete();
-    lightVAO.Delete();
-    lightVBO.Delete();
-    lightEBO.Delete();
     lightShader.Delete();
 
     // glfw: terminate, clearing all previously allocated GLFWresources.

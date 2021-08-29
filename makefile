@@ -19,7 +19,7 @@ EXECUTABLE	:=	main
 all: ./$(EXECUTABLE)
 
 ./$(EXECUTABLE): $(SRC)/*.cpp
-	g++ -g -std=c++17  -I./include -L./lib src/main.cpp	src/Header/Model.cpp	src/Header/Mesh.cpp	src/Header/camera.cpp	src/stb.cpp	src/Header/Texture.cpp	src/Header/VAO.cpp	src/Header/EBO.cpp	src/Header/VBO.cpp	src/Header/shaderClass.cpp	src/glad.c -o main  -lglfw3dll
+	g++ -g -std=c++17  -I./include -L./lib src/main.cpp	src/Header/Mesh.cpp	src/Header/camera.cpp	src/stb.cpp	src/Header/Texture.cpp	src/Header/VAO.cpp	src/Header/EBO.cpp	src/Header/VBO.cpp	src/Header/shaderClass.cpp	src/glad.c -o main  -lglfw3dll
 
 # ./obj/main.o:	./obj/VAO.o
 # 	g++	-g	-std=c++17	-I./include -L./lib	./src/main.cpp	src/glad.c	-o	obj/main.o
